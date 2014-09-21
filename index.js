@@ -17,8 +17,7 @@ function error() {
 app.use(function (req, downstreamRes) {
 	var query = url.parse(req.url, true).query;
 	var upstreamUrl = query.url;
-	var successCallback = query.successCallback;
-	var errorCallback = query.errorCallback;
+	var successCallback = query.callback;
 
 	if (!upstreamUrl) {
 		return;
@@ -33,17 +32,17 @@ app.use(function (req, downstreamRes) {
 		log('done ' + upstreamUrl);
 
 		if (upstreamRes.status >= 400) {
-			downstreamRes.write(errorCallback + '("');
-			downstreamRes.write(JSON.stringify(script));
+			downstreamRes.write(successCallback + '("');
+			downstreamRes.write(JSON.stringify({error: script}));
 			downstreamRes.write(');');
-			downstreamRes.end()
+			downstreamRes.end();
 			return;
 		}
 
 		downstreamRes.write(successCallback + '(');
-		downstreamRes.write(JSON.stringify(script));
+		downstreamRes.write(JSON.stringify({success: script}));
 		downstreamRes.write(');');
-		downstreamRes.end()
+		downstreamRes.end();
 	});
 });
 
